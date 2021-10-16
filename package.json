@@ -1,0 +1,38 @@
+{
+  "name": "webgl-fire-sword",
+  "version": "0.0.1",
+  "description": "Sword with fire effect made with threejs",
+  "author": "Frederic Godin",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "prepare": "git config --local core.hooksPath .hooks",
+    "ts-check": "tsc --noEmit",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "@tweakpane/core": "^1.0.6",
+    "@types/node": "^16.9.6",
+    "@types/stats.js": "^0.17.0",
+    "@types/three": "^0.132.0",
+    "@typescript-eslint/eslint-plugin": "^4.31.2",
+    "@typescript-eslint/parser": "^4.31.2",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.2",
+    "glslx": "^0.2.13",
+    "lint-staged": "^11.1.2",
+    "prettier": "^2.4.1",
+    "prettier-plugin-organize-imports": "^2.3.4",
+    "typescript": "^4.3.2",
+    "vite": "^2.5.4",
+    "vite-plugin-inspect": "^0.3.6"
+  },
+  "dependencies": {
+    "stats.js": "^0.17.0",
+    "three": "^0.132.2",
+    "tweakpane": "^3.0.5"
+  }
+}
