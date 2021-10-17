@@ -11,6 +11,19 @@ uniform vec2 bendOrigin;
 uniform float bendScale;
 uniform float verticalBend;
 uniform float horizontalBend;
+uniform sampler2D trailPattern;
+uniform sampler2D trailMask;
+uniform sampler2D trailNoise;
+uniform float patternScale;
+uniform float patternOffset;
+uniform float patternDeform;
+uniform float maskOffset;
+uniform vec3 color1;
+uniform vec3 color2;
+uniform vec3 color3;
+uniform vec3 color4;
+
+varying vec2 v_uv;
 
 #include "./transforms.glslx"
 
@@ -30,11 +43,29 @@ export void fireVertex() {
   vec4 viewPosition = viewMatrix * vertexPosition;
 
   gl_Position = projectionMatrix * viewPosition;
+
+  v_uv = uv;
 }
 
 export void fireFragment() {
-  vec3 color = vec3(1.0);
-  float alpha = 1.0;
+  vec3 noise = texture2D(trailNoise, v_uv).rgb;
+
+  vec2 patternUv = v_uv * vec2(1, patternScale) + vec2(patternOffset, 0);
+  patternUv = mix(patternUv, noise.rg, patternDeform);
+  vec2 maskUv = v_uv + vec2(maskOffset, 0);
+  maskUv = mix(maskUv, noise.rg, 0.1);
+
+  float firePattern = texture2D(trailPattern, patternUv).r;
+  float fireMask = texture2D(trailMask, maskUv).r;
+
+  float shape = firePattern * fireMask;
+
+  // color ramp
+  vec3 color = mix(color1, color2, smoothstep(0.0, 0.4, shape));
+  color = mix(color, color3, smoothstep(0.4, 0.6, shape));
+  color = mix(color, color4, smoothstep(0.6, 0.9, shape));
+
+  float alpha = shape;
 
   gl_FragColor = vec4(color, alpha);
 }

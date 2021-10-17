@@ -29,7 +29,7 @@ const main = () => {
     progress => {
       loader.setPercentage(progress)
     },
-    ({ sword, environment }) => {
+    ({ sword, environment, swordTrail, swordTrailMask, swordTrailNoise }) => {
       scene.environment = environment
 
       scene.add(sword)
@@ -46,6 +46,23 @@ const main = () => {
 
       const fireSize = 0.75
       const fireDivisions = 10
+      const fireUniforms = {
+        bendScale: { value: 0.5 },
+        bendOrigin: { value: new THREE.Vector2(-fireSize / 2, 0) },
+        verticalBend: { value: 0 },
+        horizontalBend: { value: 0 },
+        trailPattern: { value: swordTrail },
+        trailMask: { value: swordTrailMask },
+        trailNoise: { value: swordTrailNoise },
+        patternScale: { value: 2 },
+        patternOffset: { value: 0 },
+        patternDeform: { value: 0.133 },
+        maskOffset: { value: 0 },
+        color1: { value: new THREE.Color(0xe74c3c) },
+        color2: { value: new THREE.Color(0xe67e22) },
+        color3: { value: new THREE.Color(0xf1c40f) },
+        color4: { value: new THREE.Color(0xffffff) },
+      }
       const plane = new THREE.Mesh(
         new THREE.PlaneGeometry(fireSize, fireSize, fireDivisions),
         new THREE.RawShaderMaterial({
@@ -53,12 +70,7 @@ const main = () => {
           fragmentShader: fireFragment,
           transparent: true,
           side: THREE.DoubleSide,
-          uniforms: {
-            bendScale: { value: 0.5 },
-            bendOrigin: { value: new THREE.Vector2(-fireSize / 2, 0) },
-            verticalBend: { value: 0 },
-            horizontalBend: { value: 0 },
-          },
+          uniforms: fireUniforms,
         }),
       )
       plane.rotation.y = Math.PI / 2
@@ -76,31 +88,55 @@ const main = () => {
       if (process.env.NODE_ENV === "development") {
         import("tweakpane").then(tweakpane => {
           const pane = new tweakpane.Pane()
-          pane.addInput(plane.material.uniforms.bendScale, "value", {
+          pane.addInput(fireUniforms.patternScale, "value", {
+            label: "Pattern scale",
+            min: 0.5,
+            max: 3,
+            step: 0.01,
+          })
+          pane.addInput(fireUniforms.patternOffset, "value", {
+            label: "Pattern offset",
+            min: 0,
+            max: 100,
+            step: 0.01,
+          })
+          pane.addInput(fireUniforms.patternDeform, "value", {
+            label: "Pattern deform",
+            min: 0,
+            max: 0.25,
+            step: 0.001,
+          })
+          pane.addInput(fireUniforms.maskOffset, "value", {
+            label: "Mask offset",
+            min: 0,
+            max: 1,
+            step: 0.01,
+          })
+          pane.addInput(fireUniforms.bendScale, "value", {
             label: "Bend scale",
             min: 0,
             max: 1,
             step: 0.01,
           })
-          pane.addInput(plane.material.uniforms.bendOrigin.value, "y", {
+          pane.addInput(fireUniforms.bendOrigin.value, "y", {
             label: "Bend origin",
             min: -1,
             max: 1,
             step: 0.01,
           })
-          pane.addInput(plane.material.uniforms.verticalBend, "value", {
+          pane.addInput(fireUniforms.verticalBend, "value", {
             label: "Vertical bend",
             min: -Math.PI,
             max: Math.PI,
             step: 0.01,
           })
-          pane.addInput(plane.material.uniforms.bendOrigin.value, "x", {
+          pane.addInput(fireUniforms.bendOrigin.value, "x", {
             label: "Horizontal bend origin",
             min: -1,
             max: 1,
             step: 0.01,
           })
-          pane.addInput(plane.material.uniforms.horizontalBend, "value", {
+          pane.addInput(fireUniforms.horizontalBend, "value", {
             label: "Horizontal bend",
             min: -Math.PI,
             max: Math.PI,
@@ -179,6 +215,9 @@ const getLoaderControls = () => {
 
 type SceneAssets = {
   sword: THREE.Group
+  swordTrail: THREE.Texture
+  swordTrailMask: THREE.Texture
+  swordTrailNoise: THREE.Texture
   environment: THREE.CubeTexture
 }
 
@@ -192,6 +231,9 @@ const loadAssets = (
   // use let for textures for consistency
   let sword: THREE.Group
   let environment: THREE.CubeTexture // eslint-disable-line prefer-const
+  let swordTrail: THREE.Texture // eslint-disable-line prefer-const
+  let swordTrailMask: THREE.Texture // eslint-disable-line prefer-const
+  let swordTrailNoise: THREE.Texture // eslint-disable-line prefer-const
 
   const handleLoad = () => {
     if (!failed) {
@@ -199,6 +241,9 @@ const loadAssets = (
       onSuccess({
         sword,
         environment,
+        swordTrail,
+        swordTrailMask,
+        swordTrailNoise,
       })
     }
   }
@@ -218,6 +263,7 @@ const loadAssets = (
   )
   const gltfLoader = new GLTFLoader(manager)
   const cubeTextureLoader = new THREE.CubeTextureLoader(manager)
+  const textureLoader = new THREE.TextureLoader(manager)
 
   gltfLoader.load("/objects/sword/sword.gltf", gltf => {
     sword = gltf.scenes[0]
@@ -230,6 +276,12 @@ const loadAssets = (
     "/environment/pz.png",
     "/environment/nz.png",
   ])
+  swordTrail = textureLoader.load("/textures/sword/sword-trail.png")
+  swordTrailMask = textureLoader.load("/textures/sword/sword-trail-mask.png")
+  swordTrailNoise = textureLoader.load("/textures/sword/sword-trail-noise.png")
+
+  swordTrail.wrapS = THREE.RepeatWrapping
+  swordTrail.wrapT = THREE.RepeatWrapping
 }
 
 // Playground implementation
@@ -265,7 +317,7 @@ const createPlayground = ({
     canvas,
     antialias: true,
   })
-  renderer.setClearColor(0x000000)
+  renderer.setClearColor(0x333333)
   renderer.physicallyCorrectLights = true
   renderer.toneMapping = THREE.ReinhardToneMapping
   renderer.toneMappingExposure = 3
