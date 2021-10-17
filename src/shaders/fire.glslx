@@ -1,0 +1,40 @@
+precision highp float;
+
+attribute vec3 position;
+attribute vec2 uv;
+
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+
+uniform vec2 bendOrigin;
+uniform float bendScale;
+uniform float verticalBend;
+uniform float horizontalBend;
+
+#include "./transforms.glslx"
+
+export void fireVertex() {
+  float yAngle = horizontalBend * uv.x;
+  float zAngle = verticalBend * uv.x;
+  float scaleX = 1.0 + abs(verticalBend * bendScale);
+  vec3 rotationOrigin = vec3(bendOrigin, 0);
+
+  mat4 bendMatrix = translate(rotationOrigin)
+                  * rotateZ(zAngle)
+                  * rotateY(yAngle)
+                  * scale(vec3(scaleX, 1, 1))
+                  * translate(-rotationOrigin);
+  vec4 p = bendMatrix * vec4(position, 1.0);
+  vec4 vertexPosition = modelMatrix * p;
+  vec4 viewPosition = viewMatrix * vertexPosition;
+
+  gl_Position = projectionMatrix * viewPosition;
+}
+
+export void fireFragment() {
+  vec3 color = vec3(1.0);
+  float alpha = 1.0;
+
+  gl_FragColor = vec4(color, alpha);
+}

@@ -5,6 +5,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
+import { fireFragment, fireVertex } from "./shaders/fire.glslx"
 
 const MAX_PIXEL_RATIO = 2
 
@@ -33,11 +34,6 @@ const main = () => {
 
       scene.add(sword)
 
-      // Add tweakpane only during development
-      if (process.env.NODE_ENV === "development") {
-        // import tweakpane here
-      }
-
       scene.traverse(child => {
         if (
           child instanceof THREE.Mesh &&
@@ -48,8 +44,70 @@ const main = () => {
         }
       })
 
+      const fireSize = 0.75
+      const fireDivisions = 10
+      const plane = new THREE.Mesh(
+        new THREE.PlaneGeometry(fireSize, fireSize, fireDivisions),
+        new THREE.RawShaderMaterial({
+          vertexShader: fireVertex,
+          fragmentShader: fireFragment,
+          transparent: true,
+          side: THREE.DoubleSide,
+          uniforms: {
+            bendScale: { value: 0.5 },
+            bendOrigin: { value: new THREE.Vector2(-fireSize / 2, 0) },
+            verticalBend: { value: 0 },
+            horizontalBend: { value: 0 },
+          },
+        }),
+      )
+      plane.rotation.y = Math.PI / 2
+      plane.position.y = 0.38
+      plane.position.z = -0.395
+      scene.add(plane)
+
       const clock = new THREE.Clock()
       clock.start()
+
+      const axes = new THREE.AxesHelper()
+      scene.add(axes)
+
+      // Add tweakpane only during development
+      if (process.env.NODE_ENV === "development") {
+        import("tweakpane").then(tweakpane => {
+          const pane = new tweakpane.Pane()
+          pane.addInput(plane.material.uniforms.bendScale, "value", {
+            label: "Bend scale",
+            min: 0,
+            max: 1,
+            step: 0.01,
+          })
+          pane.addInput(plane.material.uniforms.bendOrigin.value, "y", {
+            label: "Bend origin",
+            min: -1,
+            max: 1,
+            step: 0.01,
+          })
+          pane.addInput(plane.material.uniforms.verticalBend, "value", {
+            label: "Vertical bend",
+            min: -Math.PI,
+            max: Math.PI,
+            step: 0.01,
+          })
+          pane.addInput(plane.material.uniforms.bendOrigin.value, "x", {
+            label: "Horizontal bend origin",
+            min: -1,
+            max: 1,
+            step: 0.01,
+          })
+          pane.addInput(plane.material.uniforms.horizontalBend, "value", {
+            label: "Horizontal bend",
+            min: -Math.PI,
+            max: Math.PI,
+            step: 0.01,
+          })
+        })
+      }
 
       createPlayground({
         scene,
