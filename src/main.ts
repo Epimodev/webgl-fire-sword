@@ -1,11 +1,11 @@
 import Stats from "stats.js"
 import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
-import { fireFragment, fireVertex } from "./shaders/fire.glslx"
+import { createFire, FireUniforms } from "./fire"
+import { loadAssets } from "./utils/assets"
 
 const MAX_PIXEL_RATIO = 2
 
@@ -29,7 +29,8 @@ const main = () => {
     progress => {
       loader.setPercentage(progress)
     },
-    ({ sword, environment, swordTrail, swordTrailMask, swordTrailNoise }) => {
+    assets => {
+      const { sword, environment } = assets
       scene.environment = environment
 
       scene.add(sword)
@@ -44,104 +45,22 @@ const main = () => {
         }
       })
 
-      const fireSize = 0.75
-      const fireDivisions = 10
-      const fireUniforms = {
-        bendScale: { value: 0.5 },
-        bendOrigin: { value: new THREE.Vector2(-fireSize / 2, 0) },
-        verticalBend: { value: 0 },
-        horizontalBend: { value: 0 },
-        trailPattern: { value: swordTrail },
-        trailMask: { value: swordTrailMask },
-        trailNoise: { value: swordTrailNoise },
-        patternScale: { value: 2 },
-        patternOffset: { value: 0 },
-        patternDeform: { value: 0.133 },
-        maskOffset: { value: 0 },
-        color1: { value: new THREE.Color(0xe74c3c) },
-        color2: { value: new THREE.Color(0xe67e22) },
-        color3: { value: new THREE.Color(0xf1c40f) },
-        color4: { value: new THREE.Color(0xffffff) },
-      }
-      const plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(fireSize, fireSize, fireDivisions),
-        new THREE.RawShaderMaterial({
-          vertexShader: fireVertex,
-          fragmentShader: fireFragment,
-          transparent: true,
-          side: THREE.DoubleSide,
-          uniforms: fireUniforms,
-        }),
-      )
-      plane.rotation.y = Math.PI / 2
-      plane.position.y = 0.38
-      plane.position.z = -0.395
-      scene.add(plane)
+      const fire = createFire(assets)
+      fire.rotation.y = Math.PI / 2
+      fire.position.y = 0.38
+      fire.position.z = -0.395
+      scene.add(fire)
 
       const clock = new THREE.Clock()
       clock.start()
 
-      const axes = new THREE.AxesHelper()
-      scene.add(axes)
+      // const axes = new THREE.AxesHelper()
+      // scene.add(axes)
 
       // Add tweakpane only during development
       if (process.env.NODE_ENV === "development") {
-        import("tweakpane").then(tweakpane => {
-          const pane = new tweakpane.Pane()
-          pane.addInput(fireUniforms.patternScale, "value", {
-            label: "Pattern scale",
-            min: 0.5,
-            max: 3,
-            step: 0.01,
-          })
-          pane.addInput(fireUniforms.patternOffset, "value", {
-            label: "Pattern offset",
-            min: 0,
-            max: 100,
-            step: 0.01,
-          })
-          pane.addInput(fireUniforms.patternDeform, "value", {
-            label: "Pattern deform",
-            min: 0,
-            max: 0.25,
-            step: 0.001,
-          })
-          pane.addInput(fireUniforms.maskOffset, "value", {
-            label: "Mask offset",
-            min: 0,
-            max: 1,
-            step: 0.01,
-          })
-          pane.addInput(fireUniforms.bendScale, "value", {
-            label: "Bend scale",
-            min: 0,
-            max: 1,
-            step: 0.01,
-          })
-          pane.addInput(fireUniforms.bendOrigin.value, "y", {
-            label: "Bend origin",
-            min: -1,
-            max: 1,
-            step: 0.01,
-          })
-          pane.addInput(fireUniforms.verticalBend, "value", {
-            label: "Vertical bend",
-            min: -Math.PI,
-            max: Math.PI,
-            step: 0.01,
-          })
-          pane.addInput(fireUniforms.bendOrigin.value, "x", {
-            label: "Horizontal bend origin",
-            min: -1,
-            max: 1,
-            step: 0.01,
-          })
-          pane.addInput(fireUniforms.horizontalBend, "value", {
-            label: "Horizontal bend",
-            min: -Math.PI,
-            max: Math.PI,
-            step: 0.01,
-          })
+        import("./fire/tweakpane").then(({ createFirePane }) => {
+          createFirePane(fire.material.uniforms as FireUniforms)
         })
       }
 
@@ -211,77 +130,6 @@ const getLoaderControls = () => {
         "Failed to load assets, please retry by reloading the page."
     },
   }
-}
-
-type SceneAssets = {
-  sword: THREE.Group
-  swordTrail: THREE.Texture
-  swordTrailMask: THREE.Texture
-  swordTrailNoise: THREE.Texture
-  environment: THREE.CubeTexture
-}
-
-const loadAssets = (
-  onProgress: (progress: number) => void,
-  onSuccess: (assets: SceneAssets) => void,
-  onError: () => void,
-) => {
-  let failed = false
-
-  // use let for textures for consistency
-  let sword: THREE.Group
-  let environment: THREE.CubeTexture // eslint-disable-line prefer-const
-  let swordTrail: THREE.Texture // eslint-disable-line prefer-const
-  let swordTrailMask: THREE.Texture // eslint-disable-line prefer-const
-  let swordTrailNoise: THREE.Texture // eslint-disable-line prefer-const
-
-  const handleLoad = () => {
-    if (!failed) {
-      // We are sure assets are loaded and assigned here thanks to loading manager
-      onSuccess({
-        sword,
-        environment,
-        swordTrail,
-        swordTrailMask,
-        swordTrailNoise,
-      })
-    }
-  }
-  const handleProgress = (_url: string, loaded: number, total: number) => {
-    if (!failed) {
-      onProgress(loaded / total)
-    }
-  }
-  const handleError = () => {
-    failed = true
-    onError()
-  }
-  const manager = new THREE.LoadingManager(
-    handleLoad,
-    handleProgress,
-    handleError,
-  )
-  const gltfLoader = new GLTFLoader(manager)
-  const cubeTextureLoader = new THREE.CubeTextureLoader(manager)
-  const textureLoader = new THREE.TextureLoader(manager)
-
-  gltfLoader.load("/objects/sword/sword.gltf", gltf => {
-    sword = gltf.scenes[0]
-  })
-  environment = cubeTextureLoader.load([
-    "/environment/px.png",
-    "/environment/nx.png",
-    "/environment/py.png",
-    "/environment/ny.png",
-    "/environment/pz.png",
-    "/environment/nz.png",
-  ])
-  swordTrail = textureLoader.load("/textures/sword/sword-trail.png")
-  swordTrailMask = textureLoader.load("/textures/sword/sword-trail-mask.png")
-  swordTrailNoise = textureLoader.load("/textures/sword/sword-trail-noise.png")
-
-  swordTrail.wrapS = THREE.RepeatWrapping
-  swordTrail.wrapT = THREE.RepeatWrapping
 }
 
 // Playground implementation

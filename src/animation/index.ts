@@ -1,4 +1,4 @@
-import { invLerp, lerp } from "../math"
+import { invLerp, lerp } from "../utils/math"
 import { EasingFunction } from "./easing"
 
 // use an API with delay and duration to avoid errors as overlaping startAt and endAt and ensure the order of values as having endAt < startAt

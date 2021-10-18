@@ -25,7 +25,7 @@ uniform vec3 color4;
 
 varying vec2 v_uv;
 
-#include "./transforms.glslx"
+#include "../shaders/transforms.glslx"
 
 export void fireVertex() {
   float yAngle = horizontalBend * uv.x;
