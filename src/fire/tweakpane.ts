@@ -1,6 +1,19 @@
 import * as Tweakpane from "tweakpane"
 import type { FireUniforms } from "./index"
 
+const addColorInput = (
+  pane: Tweakpane.Pane,
+  label: string,
+  color: THREE.Color,
+) => {
+  const object = {
+    color: `#${color.getHexString()}`,
+  }
+  pane
+    .addInput(object, "color", { label })
+    .on("change", ({ value }) => color.set(value))
+}
+
 export const createFirePane = (uniforms: FireUniforms): void => {
   const pane = new Tweakpane.Pane()
 
@@ -58,4 +71,8 @@ export const createFirePane = (uniforms: FireUniforms): void => {
     max: Math.PI,
     step: 0.01,
   })
+  addColorInput(pane, "Color 1", uniforms.u_color1.value)
+  addColorInput(pane, "Color 2", uniforms.u_color2.value)
+  addColorInput(pane, "Color 3", uniforms.u_color3.value)
+  addColorInput(pane, "Color 4", uniforms.u_color4.value)
 }
