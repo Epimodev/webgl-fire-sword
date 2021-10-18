@@ -27,7 +27,7 @@ export const createFire = (
 ): THREE.Mesh<THREE.PlaneGeometry, THREE.RawShaderMaterial> => {
   const fireWidth = 0.76
   const fireHeight = 0.8
-  const fireDivisions = 10
+  const fireDivisions = 100
   const fireUniforms: FireUniforms = {
     u_time: time,
     u_bendScale: { value: 0.5 },
