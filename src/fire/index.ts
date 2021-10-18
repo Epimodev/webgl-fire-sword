@@ -25,12 +25,13 @@ export const createFire = (
   { swordTrail, swordTrailMask, swordTrailNoise }: SceneAssets,
   time: THREE.IUniform<number>,
 ): THREE.Mesh<THREE.PlaneGeometry, THREE.RawShaderMaterial> => {
-  const fireSize = 0.75
+  const fireWidth = 0.76
+  const fireHeight = 0.8
   const fireDivisions = 10
   const fireUniforms: FireUniforms = {
     u_time: time,
     u_bendScale: { value: 0.5 },
-    u_bendOrigin: { value: new THREE.Vector2(-fireSize / 2, 0) },
+    u_bendOrigin: { value: new THREE.Vector2(-fireWidth / 2, 0) },
     u_verticalBend: { value: 0 },
     u_horizontalBend: { value: 0 },
     u_trailPattern: { value: swordTrail },
@@ -40,13 +41,13 @@ export const createFire = (
     u_patternSpeed: { value: 30 },
     u_patternDeform: { value: 0.133 },
     u_maskOffset: { value: 0 },
-    u_color1: { value: new THREE.Color(0xe74c3c) },
-    u_color2: { value: new THREE.Color(0xe67e22) },
-    u_color3: { value: new THREE.Color(0xf1c40f) },
-    u_color4: { value: new THREE.Color(0xffffff) },
+    u_color1: { value: new THREE.Color(0xff3e00) },
+    u_color2: { value: new THREE.Color(0xff7500) },
+    u_color3: { value: new THREE.Color(0xffd600) },
+    u_color4: { value: new THREE.Color(0xfff5a8) },
   }
   const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(fireSize, fireSize, fireDivisions),
+    new THREE.PlaneGeometry(fireWidth, fireHeight, fireDivisions),
     new THREE.RawShaderMaterial({
       vertexShader: fireVertex,
       fragmentShader: fireFragment,

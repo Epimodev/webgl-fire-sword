@@ -48,8 +48,8 @@ const main = () => {
 
       const fire = createFire(assets, time)
       fire.rotation.y = Math.PI / 2
-      fire.position.y = 0.38
-      fire.position.z = -0.395
+      fire.position.y = 0.41
+      fire.position.z = -0.397
       scene.add(fire)
 
       const clock = new THREE.Clock()

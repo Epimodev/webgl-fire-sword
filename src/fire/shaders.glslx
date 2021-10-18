@@ -63,9 +63,9 @@ export void fireFragment() {
   float shape = firePattern * fireMask;
 
   // color ramp
-  vec3 color = mix(u_color1, u_color2, smoothstep(0.0, 0.4, shape));
-  color = mix(color, u_color3, smoothstep(0.4, 0.6, shape));
-  color = mix(color, u_color4, smoothstep(0.6, 0.9, shape));
+  vec3 color = mix(u_color1, u_color2, smoothstep(0.0, 0.432, shape));
+  color = mix(color, u_color3, smoothstep(0.432, 0.709, shape));
+  color = mix(color, u_color4, smoothstep(0.709, 0.873, shape));
 
   float alpha = shape;
 
