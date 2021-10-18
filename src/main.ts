@@ -5,7 +5,7 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import { assets } from "./assets"
-import { createFire, FireUniforms } from "./fire"
+import { bladeVelocity, createFire, FireUniforms } from "./fire"
 import { loadAssets } from "./utils/assetsLoader"
 import { getLoader } from "./utils/loader"
 
@@ -49,11 +49,23 @@ const main = () => {
 
       const time: THREE.IUniform<number> = { value: 0 }
 
+      // create empty group to compute speed from blade center
+      const bladeCenter = new THREE.Group()
+      bladeCenter.position.y = 0.35
+
       const fire = createFire(sceneAssets, time)
       fire.rotation.y = Math.PI / 2
       fire.position.y = 0.41
       fire.position.z = -0.397
-      scene.add(fire)
+      sword.add(fire)
+      sword.add(bladeCenter)
+      // @ts-expect-error
+      const fireUniform: FireUniforms = fire.material.uniforms
+
+      bladeVelocity(bladeCenter, velocity => {
+        fireUniform.u_verticalBend.value = -velocity.position.y * 0.1
+        // console.log(velocity.position)
+      })
 
       const clock = new THREE.Clock()
       clock.start()
@@ -63,8 +75,8 @@ const main = () => {
 
       // Add tweakpane only during development
       if (process.env.NODE_ENV === "development") {
-        import("./fire/tweakpane").then(({ createFirePane }) => {
-          createFirePane(fire.material.uniforms as FireUniforms)
+        import("./tweakpane").then(({ createTweakpane }) => {
+          createTweakpane(sword, fire.material.uniforms as FireUniforms)
         })
       }
 

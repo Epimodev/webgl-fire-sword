@@ -1,6 +1,12 @@
 import * as THREE from "three"
+import { Vector3 } from "three"
 import type { SceneAssets } from "../assets"
 import { fireFragment, fireVertex } from "./shaders.glslx"
+
+export type BladeVelocity = {
+  position: THREE.Vector3
+  direction: THREE.Vector3
+}
 
 export type FireUniforms = {
   u_time: THREE.IUniform<number>
@@ -58,4 +64,59 @@ export const createFire = (
   )
 
   return plane
+}
+
+const getVectorVelocity = (
+  target: Vector3,
+  previous: Vector3,
+  current: Vector3,
+  deltaTime: number,
+): void => {
+  target.x = (current.x - previous.x) / deltaTime
+  target.y = (current.y - previous.y) / deltaTime
+  target.z = (current.z - previous.z) / deltaTime
+}
+
+export const bladeVelocity = (
+  point: THREE.Group,
+  onFrame: (velocity: BladeVelocity) => void,
+): void => {
+  const clock = new THREE.Clock()
+  clock.start()
+
+  let lastTime = clock.getElapsedTime()
+  const lastPosition = point.getWorldPosition(new Vector3())
+  const position = lastPosition.clone()
+  const lastDirection = point.getWorldDirection(new Vector3())
+  const direction = lastDirection.clone()
+
+  const velocity = {
+    position: new Vector3(),
+    direction: new Vector3(),
+  }
+
+  const updateSpeed = () => {
+    const time = clock.getElapsedTime()
+    const deltaTime = time - lastTime
+    lastTime = time
+
+    // update position
+    point.getWorldPosition(position)
+    // update position speed
+    getVectorVelocity(velocity.position, lastPosition, position, deltaTime)
+    // update last position for next compute
+    lastPosition.copy(position)
+
+    // update direction
+    point.getWorldDirection(direction)
+    // update direction speed
+    getVectorVelocity(velocity.direction, lastDirection, direction, deltaTime)
+    // update last direction for next compute
+    lastDirection.copy(direction)
+
+    onFrame(velocity)
+    window.requestAnimationFrame(updateSpeed)
+  }
+
+  window.requestAnimationFrame(updateSpeed)
 }
