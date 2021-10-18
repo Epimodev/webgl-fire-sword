@@ -1,11 +1,15 @@
 import * as THREE from "three"
-import { Vector3 } from "three"
 import type { SceneAssets } from "../assets"
 import { fireFragment, fireVertex } from "./shaders.glslx"
 
-export type BladeVelocity = {
+export type VectorMovement = {
   position: THREE.Vector3
-  direction: THREE.Vector3
+  velocity: THREE.Vector3
+}
+
+export type BladeMovement = {
+  position: VectorMovement
+  rotation: VectorMovement
 }
 
 export type FireUniforms = {
@@ -66,57 +70,76 @@ export const createFire = (
   return plane
 }
 
-const getVectorVelocity = (
-  target: Vector3,
-  previous: Vector3,
-  current: Vector3,
-  deltaTime: number,
-): void => {
-  target.x = (current.x - previous.x) / deltaTime
-  target.y = (current.y - previous.y) / deltaTime
-  target.z = (current.z - previous.z) / deltaTime
-}
-
-export const bladeVelocity = (
-  point: THREE.Group,
-  onFrame: (velocity: BladeVelocity) => void,
-): void => {
-  const clock = new THREE.Clock()
-  clock.start()
-
-  let lastTime = clock.getElapsedTime()
-  const lastPosition = point.getWorldPosition(new Vector3())
-  const position = lastPosition.clone()
-  const lastDirection = point.getWorldDirection(new Vector3())
-  const direction = lastDirection.clone()
-
-  const velocity = {
-    position: new Vector3(),
-    direction: new Vector3(),
+const getVelocity =
+  (target: THREE.Vector3, previous: THREE.Vector3, current: THREE.Vector3) =>
+  (deltaTime: number): void => {
+    target.x = (current.x - previous.x) / deltaTime
+    target.y = (current.y - previous.y) / deltaTime
+    target.z = (current.z - previous.z) / deltaTime
   }
 
-  const updateSpeed = () => {
+/**
+ * @param position input
+ * @param velocity updated by the function over time
+ * @param acceleration updated by the function over time
+ */
+const vectorAcceleration = ({ position, velocity }: VectorMovement) => {
+  const clock = new THREE.Clock()
+  clock.start()
+  let lastTime = clock.getElapsedTime()
+
+  const previousPosition = position.clone()
+  const updateVelocity = getVelocity(velocity, previousPosition, position)
+
+  const tick = () => {
     const time = clock.getElapsedTime()
     const deltaTime = time - lastTime
     lastTime = time
 
-    // update position
-    point.getWorldPosition(position)
-    // update position speed
-    getVectorVelocity(velocity.position, lastPosition, position, deltaTime)
-    // update last position for next compute
-    lastPosition.copy(position)
+    updateVelocity(deltaTime)
+    previousPosition.copy(position)
 
-    // update direction
-    point.getWorldDirection(direction)
-    // update direction speed
-    getVectorVelocity(velocity.direction, lastDirection, direction, deltaTime)
-    // update last direction for next compute
-    lastDirection.copy(direction)
-
-    onFrame(velocity)
-    window.requestAnimationFrame(updateSpeed)
+    window.requestAnimationFrame(tick)
   }
 
-  window.requestAnimationFrame(updateSpeed)
+  window.requestAnimationFrame(tick)
+}
+
+export const bladeMovement = (
+  point: THREE.Group,
+  onFrame: (movement: BladeMovement) => void,
+): void => {
+  const position = point.getWorldPosition(new THREE.Vector3())
+  const quarternion = point.getWorldQuaternion(new THREE.Quaternion())
+  const euler = new THREE.Euler()
+  euler.setFromQuaternion(quarternion)
+  const rotation = new THREE.Vector3(euler.x, euler.y, euler.z)
+
+  const bladeMovement: BladeMovement = {
+    position: {
+      position: position,
+      velocity: new THREE.Vector3(),
+    },
+    rotation: {
+      position: rotation,
+      velocity: new THREE.Vector3(),
+    },
+  }
+
+  vectorAcceleration(bladeMovement.position)
+  vectorAcceleration(bladeMovement.rotation)
+
+  const tick = () => {
+    point.getWorldPosition(position)
+
+    point.getWorldQuaternion(quarternion)
+    euler.setFromQuaternion(quarternion)
+    rotation.set(euler.x, euler.y, euler.z)
+
+    onFrame(bladeMovement)
+
+    window.requestAnimationFrame(tick)
+  }
+
+  window.requestAnimationFrame(tick)
 }

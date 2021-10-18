@@ -5,9 +5,10 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import { assets } from "./assets"
-import { bladeVelocity, createFire, FireUniforms } from "./fire"
+import { bladeMovement, createFire, FireUniforms } from "./fire"
 import { loadAssets } from "./utils/assetsLoader"
 import { getLoader } from "./utils/loader"
+import { clamp, lerpVec3 } from "./utils/math"
 
 const MAX_PIXEL_RATIO = 2
 
@@ -62,9 +63,17 @@ const main = () => {
       // @ts-expect-error
       const fireUniform: FireUniforms = fire.material.uniforms
 
-      bladeVelocity(bladeCenter, velocity => {
-        fireUniform.u_verticalBend.value = -velocity.position.y * 0.1
-        // console.log(velocity.position)
+      const velocity = new THREE.Vector3()
+      const rotationVelocity = new THREE.Vector3()
+      const interpolateVelocity = lerpVec3(velocity)
+      const interpolateRotationVelocity = lerpVec3(rotationVelocity)
+
+      bladeMovement(bladeCenter, ({ position, rotation }) => {
+        interpolateVelocity(velocity, position.velocity, 0.1)
+        interpolateRotationVelocity(rotationVelocity, rotation.velocity, 0.1)
+
+        fireUniform.u_verticalBend.value = -velocity.y * 0.3
+        fireUniform.u_maskOffset.value = clamp(0, 0.5, 1 - velocity.z * 0.3)
       })
 
       const clock = new THREE.Clock()
