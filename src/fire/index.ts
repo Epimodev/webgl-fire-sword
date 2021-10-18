@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import type { SceneAssets } from "../utils/assets"
+import type { SceneAssets } from "../assets"
 import { fireFragment, fireVertex } from "./shaders.glslx"
 
 export type FireUniforms = {

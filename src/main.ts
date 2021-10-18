@@ -4,8 +4,9 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
+import { assets } from "./assets"
 import { createFire, FireUniforms } from "./fire"
-import { loadAssets } from "./utils/assets"
+import { loadAssets } from "./utils/assetsLoader"
 
 const MAX_PIXEL_RATIO = 2
 
@@ -26,11 +27,12 @@ const main = () => {
   const loader = getLoaderControls()
 
   loadAssets(
+    assets,
     progress => {
       loader.setPercentage(progress)
     },
-    assets => {
-      const { sword, environment } = assets
+    sceneAssets => {
+      const { sword, environment } = sceneAssets
       scene.environment = environment
 
       scene.add(sword)
@@ -46,7 +48,7 @@ const main = () => {
 
       const time: THREE.IUniform<number> = { value: 0 }
 
-      const fire = createFire(assets, time)
+      const fire = createFire(sceneAssets, time)
       fire.rotation.y = Math.PI / 2
       fire.position.y = 0.41
       fire.position.z = -0.397
