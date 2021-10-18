@@ -7,6 +7,7 @@ uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 
+uniform float u_time;
 uniform vec2 u_bendOrigin;
 uniform float u_bendScale;
 uniform float u_verticalBend;
@@ -15,7 +16,7 @@ uniform sampler2D u_trailPattern;
 uniform sampler2D u_trailMask;
 uniform sampler2D u_trailNoise;
 uniform float u_patternScale;
-uniform float u_patternOffset;
+uniform float u_patternSpeed;
 uniform float u_patternDeform;
 uniform float u_maskOffset;
 uniform vec3 u_color1;
@@ -50,7 +51,8 @@ export void fireVertex() {
 export void fireFragment() {
   vec3 noise = texture2D(u_trailNoise, v_uv).rgb;
 
-  vec2 patternUv = v_uv * vec2(1, u_patternScale) + vec2(u_patternOffset, 0);
+  float patternOffset = -u_time * u_patternSpeed * 0.1;
+  vec2 patternUv = v_uv * vec2(1, u_patternScale) + vec2(patternOffset, 0);
   patternUv = mix(patternUv, noise.rg, u_patternDeform);
   vec2 maskUv = v_uv + vec2(u_maskOffset, 0);
   maskUv = mix(maskUv, noise.rg, 0.1);

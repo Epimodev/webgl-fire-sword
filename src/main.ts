@@ -34,7 +34,6 @@ const main = () => {
       scene.environment = environment
 
       scene.add(sword)
-
       scene.traverse(child => {
         if (
           child instanceof THREE.Mesh &&
@@ -45,7 +44,9 @@ const main = () => {
         }
       })
 
-      const fire = createFire(assets)
+      const time: THREE.IUniform<number> = { value: 0 }
+
+      const fire = createFire(assets, time)
       fire.rotation.y = Math.PI / 2
       fire.position.y = 0.38
       fire.position.z = -0.395
@@ -69,6 +70,7 @@ const main = () => {
         camera,
         onTick: () => {
           const elapsedTime = clock.getElapsedTime()
+          time.value = elapsedTime
         },
       })
 

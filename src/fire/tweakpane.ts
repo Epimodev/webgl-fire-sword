@@ -23,10 +23,10 @@ export const createFirePane = (uniforms: FireUniforms): void => {
     max: 3,
     step: 0.01,
   })
-  pane.addInput(uniforms.u_patternOffset, "value", {
-    label: "Pattern offset",
+  pane.addInput(uniforms.u_patternSpeed, "value", {
+    label: "Pattern speed",
     min: 0,
-    max: 100,
+    max: 60,
     step: 0.01,
   })
   pane.addInput(uniforms.u_patternDeform, "value", {
