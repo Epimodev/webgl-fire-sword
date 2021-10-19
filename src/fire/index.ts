@@ -8,16 +8,16 @@ export type VectorMovement = {
   velocity: Vector3
 }
 
-export type BladeVelocity = {
-  rotation: VectorMovement
+export type SwordVelocity = {
+  swordRotation: VectorMovement
+  handleRotation: VectorMovement
 }
 
 export type FireUniforms = {
   u_time: THREE.IUniform<number>
-  u_rotationVelocity: THREE.IUniform<number>
+  u_rotationVelocity: THREE.IUniform<THREE.Vector3>
   u_bendScale: THREE.IUniform<number>
   u_bendOrigin: THREE.IUniform<THREE.Vector2>
-  u_horizontalBend: THREE.IUniform<number>
   u_trailPattern: THREE.IUniform<THREE.Texture>
   u_trailMask: THREE.IUniform<THREE.Texture>
   u_trailNoise: THREE.IUniform<THREE.Texture>
@@ -39,10 +39,9 @@ export const createFire = (
   const fireDivisions = 100
   const fireUniforms: FireUniforms = {
     u_time: time,
-    u_rotationVelocity: { value: 0 },
+    u_rotationVelocity: { value: new THREE.Vector3() },
     u_bendScale: { value: 0.5 },
     u_bendOrigin: { value: new THREE.Vector2(-fireWidth / 2, 0) },
-    u_horizontalBend: { value: 0 },
     u_trailPattern: { value: swordTrail },
     u_trailMask: { value: swordTrailMask },
     u_trailNoise: { value: swordTrailNoise },
@@ -63,6 +62,7 @@ export const createFire = (
       transparent: true,
       side: THREE.DoubleSide,
       uniforms: fireUniforms,
+      depthTest: false,
     }),
   )
 
@@ -105,20 +105,27 @@ const vectorVelocity = ({ position, velocity }: VectorMovement) => {
   window.requestAnimationFrame(tick)
 }
 
-export const bladeMovement = (
-  bladeHandle: THREE.Object3D,
-  onFrame: (movement: BladeVelocity) => void,
+export const swordMovement = (
+  sword: THREE.Group,
+  onFrame: (movement: SwordVelocity) => void,
 ): void => {
-  const rotation = bladeHandle.rotation
+  const handle = sword.children[0]
+  const swordRotation = sword.rotation
+  const handleRotation = handle.rotation
 
-  const bladeMovement: BladeVelocity = {
-    rotation: {
-      position: rotation,
-      velocity: new THREE.Euler(),
+  const bladeMovement: SwordVelocity = {
+    swordRotation: {
+      position: swordRotation,
+      velocity: { x: 0, y: 0, z: 0 },
+    },
+    handleRotation: {
+      position: handleRotation,
+      velocity: { x: 0, y: 0, z: 0 },
     },
   }
 
-  vectorVelocity(bladeMovement.rotation)
+  vectorVelocity(bladeMovement.swordRotation)
+  vectorVelocity(bladeMovement.handleRotation)
 
   const tick = () => {
     onFrame(bladeMovement)

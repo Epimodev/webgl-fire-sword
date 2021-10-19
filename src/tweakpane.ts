@@ -70,10 +70,16 @@ export const createTweakpane = (
   /* ========================== */
   /* ========== FIRE ========== */
   /* ========================== */
-  fireTab.addInput(fireUniforms.u_rotationVelocity, "value", {
-    label: "Velocity",
+  fireTab.addInput(fireUniforms.u_rotationVelocity.value, "x", {
+    label: "Handle velocity",
     min: 0,
     max: 20,
+    step: 0.01,
+  })
+  fireTab.addInput(fireUniforms.u_rotationVelocity.value, "z", {
+    label: "Sword z velocity",
+    min: -10,
+    max: 10,
     step: 0.01,
   })
   fireTab.addInput(fireUniforms.u_patternScale, "value", {
@@ -110,12 +116,6 @@ export const createTweakpane = (
     label: "Horizontal bend origin",
     min: -1,
     max: 1,
-    step: 0.01,
-  })
-  fireTab.addInput(fireUniforms.u_horizontalBend, "value", {
-    label: "Horizontal bend",
-    min: -Math.PI,
-    max: Math.PI,
     step: 0.01,
   })
   addColorInput(fireTab, "Color 1", fireUniforms.u_color1.value)

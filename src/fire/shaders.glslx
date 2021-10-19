@@ -8,7 +8,7 @@ uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 
 uniform float u_time;
-uniform float u_rotationVelocity;
+uniform vec3 u_rotationVelocity;
 uniform vec2 u_bendOrigin;
 uniform float u_bendScale;
 uniform float u_horizontalBend;
@@ -28,9 +28,10 @@ varying vec2 v_uv;
 #include "../shaders/transforms.glslx"
 
 export void fireVertex() {
-  float verticalBend = clamp(-u_rotationVelocity * 0.1, -1.0, 1.0);
+  float verticalBend = clamp(-u_rotationVelocity.x * 0.1, -1.0, 1.0);
+  float horizontalBend = clamp(-u_rotationVelocity.z * 0.15, -1.0, 1.0);
 
-  float yAngle = u_horizontalBend * uv.x;
+  float yAngle = horizontalBend * uv.x;
   float zAngle = verticalBend * uv.x;
   float scaleX = 1.0 + abs(verticalBend * u_bendScale);
   vec3 rotationOrigin = vec3(u_bendOrigin, 0);
@@ -55,7 +56,7 @@ export void fireFragment() {
   float patternOffset = -u_time * u_patternSpeed * 0.1;
   vec2 patternUv = v_uv * vec2(1, u_patternScale) + vec2(patternOffset, 0);
   patternUv = mix(patternUv, noise.rg, u_patternDeform);
-  float maskOffset = clamp(1.0 - u_rotationVelocity * 0.1, 0.0, 0.7);
+  float maskOffset = clamp(1.0 - u_rotationVelocity.x * 0.1, 0.0, 0.7);
   vec2 maskUv = v_uv + vec2(maskOffset, 0);
   maskUv = mix(maskUv, noise.rg, 0.1);
 

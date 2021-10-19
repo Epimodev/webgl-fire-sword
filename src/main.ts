@@ -5,7 +5,7 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import { assets } from "./assets"
-import { bladeMovement, createFire, FireUniforms } from "./fire"
+import { createFire, FireUniforms, swordMovement } from "./fire"
 import { loadAssets } from "./utils/assetsLoader"
 import { getLoader } from "./utils/loader"
 import { lerpVec3 } from "./utils/math"
@@ -60,13 +60,22 @@ const main = () => {
       // @ts-expect-error
       const fireUniform: FireUniforms = fire.material.uniforms
 
-      const rotationVelocity = new THREE.Euler()
-      const interpolateRotationVelocity = lerpVec3(rotationVelocity)
+      const swordVelocity = { x: 0, y: 0, z: 0 }
+      const interpolateSwordVelocity = lerpVec3(swordVelocity)
+      const handleVelocity = { x: 0, y: 0, z: 0 }
+      const interpolateHandleVelocity = lerpVec3(handleVelocity)
 
-      bladeMovement(handle, ({ rotation }) => {
-        interpolateRotationVelocity(rotationVelocity, rotation.velocity, 0.1)
+      swordMovement(sword, ({ swordRotation, handleRotation }) => {
+        interpolateSwordVelocity(swordVelocity, swordRotation.velocity, 0.1)
+        interpolateHandleVelocity(handleVelocity, handleRotation.velocity, 0.1)
 
-        fireUniform.u_rotationVelocity.value = rotationVelocity.x
+        // use handle rotation for trail length and vertical bend
+        // use sword rotation for horizontal bend
+        fireUniform.u_rotationVelocity.value.set(
+          handleVelocity.x,
+          swordVelocity.y,
+          swordVelocity.z,
+        )
       })
 
       const clock = new THREE.Clock()
