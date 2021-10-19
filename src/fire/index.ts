@@ -9,7 +9,7 @@ export type VectorMovement = {
 
 export type BladeMovement = {
   position: VectorMovement
-  rotation: VectorMovement
+  direction: THREE.Vector3
 }
 
 export type FireUniforms = {
@@ -56,6 +56,11 @@ export const createFire = (
     u_color3: { value: new THREE.Color(0xffd600) },
     u_color4: { value: new THREE.Color(0xfff5a8) },
   }
+  // create empty group to compute speed from blade center
+  const bladeCenter = new THREE.Group()
+  bladeCenter.position.x = -fireWidth / 2
+  bladeCenter.rotation.y = -Math.PI / 2
+
   const plane = new THREE.Mesh(
     new THREE.PlaneGeometry(fireWidth, fireHeight, fireDivisions),
     new THREE.RawShaderMaterial({
@@ -66,6 +71,8 @@ export const createFire = (
       uniforms: fireUniforms,
     }),
   )
+
+  plane.add(bladeCenter)
 
   return plane
 }
@@ -106,35 +113,25 @@ const vectorAcceleration = ({ position, velocity }: VectorMovement) => {
 }
 
 export const bladeMovement = (
-  point: THREE.Group,
+  point: THREE.Object3D,
   onFrame: (movement: BladeMovement) => void,
 ): void => {
   const position = point.getWorldPosition(new THREE.Vector3())
-  const quarternion = point.getWorldQuaternion(new THREE.Quaternion())
-  const euler = new THREE.Euler()
-  euler.setFromQuaternion(quarternion)
-  const rotation = new THREE.Vector3(euler.x, euler.y, euler.z)
+  const direction = point.getWorldDirection(new THREE.Vector3())
 
   const bladeMovement: BladeMovement = {
     position: {
       position: position,
       velocity: new THREE.Vector3(),
     },
-    rotation: {
-      position: rotation,
-      velocity: new THREE.Vector3(),
-    },
+    direction,
   }
 
   vectorAcceleration(bladeMovement.position)
-  vectorAcceleration(bladeMovement.rotation)
 
   const tick = () => {
     point.getWorldPosition(position)
-
-    point.getWorldQuaternion(quarternion)
-    euler.setFromQuaternion(quarternion)
-    rotation.set(euler.x, euler.y, euler.z)
+    point.getWorldDirection(direction)
 
     onFrame(bladeMovement)
 

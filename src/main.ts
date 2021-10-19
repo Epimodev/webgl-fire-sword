@@ -50,30 +50,31 @@ const main = () => {
 
       const time: THREE.IUniform<number> = { value: 0 }
 
-      // create empty group to compute speed from blade center
-      const bladeCenter = new THREE.Group()
-      bladeCenter.position.y = 0.35
-
       const fire = createFire(sceneAssets, time)
       fire.rotation.y = Math.PI / 2
       fire.position.y = 0.41
-      fire.position.z = -0.397
-      sword.add(fire)
-      sword.add(bladeCenter)
+      fire.position.z = -0.401
+      const blade = sword.children[0].children[0]
+      blade.add(fire)
       // @ts-expect-error
       const fireUniform: FireUniforms = fire.material.uniforms
 
       const velocity = new THREE.Vector3()
-      const rotationVelocity = new THREE.Vector3()
+      const direction = new THREE.Vector3()
       const interpolateVelocity = lerpVec3(velocity)
-      const interpolateRotationVelocity = lerpVec3(rotationVelocity)
+      const interpolateDirection = lerpVec3(direction)
 
-      bladeMovement(bladeCenter, ({ position, rotation }) => {
+      const bladeCenter = fire.children[0]
+      bladeMovement(bladeCenter, ({ position, direction: bladeDirection }) => {
+        interpolateDirection(direction, bladeDirection, 0.1)
         interpolateVelocity(velocity, position.velocity, 0.1)
-        interpolateRotationVelocity(rotationVelocity, rotation.velocity, 0.1)
 
         fireUniform.u_verticalBend.value = -velocity.y * 0.3
-        fireUniform.u_maskOffset.value = clamp(0, 0.5, 1 - velocity.z * 0.3)
+        fireUniform.u_maskOffset.value = clamp(
+          0,
+          0.5,
+          1 - velocity.z * 0.3 * direction.z,
+        )
       })
 
       const clock = new THREE.Clock()

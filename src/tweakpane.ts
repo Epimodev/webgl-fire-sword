@@ -29,37 +29,38 @@ export const createTweakpane = (
   /* ========================== */
   /* ========== SWORD ========= */
   /* ========================== */
-  swordTab.addInput(sword.position, "z", {
+  const handle = sword.children[0]
+  swordTab.addInput(handle.position, "z", {
     label: "z position",
     min: -2,
     max: 2,
     step: 0.01,
   })
-  swordTab.addInput(sword.position, "y", {
+  swordTab.addInput(handle.position, "y", {
     label: "y position",
     min: -1,
     max: 1,
     step: 0.01,
   })
-  swordTab.addInput(sword.position, "x", {
+  swordTab.addInput(handle.position, "x", {
     label: "x position",
     min: -1,
     max: 1,
     step: 0.01,
   })
-  swordTab.addInput(sword.rotation, "z", {
+  swordTab.addInput(handle.rotation, "z", {
     label: "z rotation",
     min: -Math.PI,
     max: Math.PI,
     step: 0.01,
   })
-  swordTab.addInput(sword.rotation, "y", {
+  swordTab.addInput(handle.rotation, "y", {
     label: "y rotation",
     min: -Math.PI,
     max: Math.PI,
     step: 0.01,
   })
-  swordTab.addInput(sword.rotation, "x", {
+  swordTab.addInput(handle.rotation, "x", {
     label: "x rotation",
     min: -Math.PI,
     max: Math.PI,
