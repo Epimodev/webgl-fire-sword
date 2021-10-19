@@ -70,6 +70,12 @@ export const createTweakpane = (
   /* ========================== */
   /* ========== FIRE ========== */
   /* ========================== */
+  fireTab.addInput(fireUniforms.u_rotationVelocity, "value", {
+    label: "Velocity",
+    min: 0,
+    max: 20,
+    step: 0.01,
+  })
   fireTab.addInput(fireUniforms.u_patternScale, "value", {
     label: "Pattern scale",
     min: 0.5,
@@ -88,12 +94,6 @@ export const createTweakpane = (
     max: 0.25,
     step: 0.001,
   })
-  fireTab.addInput(fireUniforms.u_maskOffset, "value", {
-    label: "Mask offset",
-    min: 0,
-    max: 1,
-    step: 0.01,
-  })
   fireTab.addInput(fireUniforms.u_bendScale, "value", {
     label: "Bend scale",
     min: 0,
@@ -104,12 +104,6 @@ export const createTweakpane = (
     label: "Bend origin",
     min: -1,
     max: 1,
-    step: 0.01,
-  })
-  fireTab.addInput(fireUniforms.u_verticalBend, "value", {
-    label: "Vertical bend",
-    min: -Math.PI,
-    max: Math.PI,
     step: 0.01,
   })
   fireTab.addInput(fireUniforms.u_bendOrigin.value, "x", {

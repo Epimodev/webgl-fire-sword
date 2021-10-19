@@ -14,9 +14,9 @@ export type BladeVelocity = {
 
 export type FireUniforms = {
   u_time: THREE.IUniform<number>
+  u_rotationVelocity: THREE.IUniform<number>
   u_bendScale: THREE.IUniform<number>
   u_bendOrigin: THREE.IUniform<THREE.Vector2>
-  u_verticalBend: THREE.IUniform<number>
   u_horizontalBend: THREE.IUniform<number>
   u_trailPattern: THREE.IUniform<THREE.Texture>
   u_trailMask: THREE.IUniform<THREE.Texture>
@@ -24,7 +24,6 @@ export type FireUniforms = {
   u_patternScale: THREE.IUniform<number>
   u_patternSpeed: THREE.IUniform<number>
   u_patternDeform: THREE.IUniform<number>
-  u_maskOffset: THREE.IUniform<number>
   u_color1: THREE.IUniform<THREE.Color>
   u_color2: THREE.IUniform<THREE.Color>
   u_color3: THREE.IUniform<THREE.Color>
@@ -40,9 +39,9 @@ export const createFire = (
   const fireDivisions = 100
   const fireUniforms: FireUniforms = {
     u_time: time,
+    u_rotationVelocity: { value: 0 },
     u_bendScale: { value: 0.5 },
     u_bendOrigin: { value: new THREE.Vector2(-fireWidth / 2, 0) },
-    u_verticalBend: { value: 0 },
     u_horizontalBend: { value: 0 },
     u_trailPattern: { value: swordTrail },
     u_trailMask: { value: swordTrailMask },
@@ -50,7 +49,6 @@ export const createFire = (
     u_patternScale: { value: 2 },
     u_patternSpeed: { value: 30 },
     u_patternDeform: { value: 0.133 },
-    u_maskOffset: { value: 0 },
     u_color1: { value: new THREE.Color(0xff3e00) },
     u_color2: { value: new THREE.Color(0xff7500) },
     u_color3: { value: new THREE.Color(0xffd600) },
@@ -83,7 +81,7 @@ const getVelocity =
  * @param position input
  * @param velocity updated by the function over time
  */
-const vectorAcceleration = ({ position, velocity }: VectorMovement) => {
+const vectorVelocity = ({ position, velocity }: VectorMovement) => {
   const clock = new THREE.Clock()
   clock.start()
   let lastTime = clock.getElapsedTime()
@@ -120,7 +118,7 @@ export const bladeMovement = (
     },
   }
 
-  vectorAcceleration(bladeMovement.rotation)
+  vectorVelocity(bladeMovement.rotation)
 
   const tick = () => {
     onFrame(bladeMovement)

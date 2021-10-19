@@ -8,7 +8,7 @@ import { assets } from "./assets"
 import { bladeMovement, createFire, FireUniforms } from "./fire"
 import { loadAssets } from "./utils/assetsLoader"
 import { getLoader } from "./utils/loader"
-import { clamp, lerpVec3 } from "./utils/math"
+import { lerpVec3 } from "./utils/math"
 
 const MAX_PIXEL_RATIO = 2
 
@@ -66,16 +66,7 @@ const main = () => {
       bladeMovement(handle, ({ rotation }) => {
         interpolateRotationVelocity(rotationVelocity, rotation.velocity, 0.1)
 
-        fireUniform.u_verticalBend.value = clamp(
-          -1,
-          1,
-          -rotationVelocity.x * 0.1,
-        )
-        fireUniform.u_maskOffset.value = clamp(
-          0,
-          0.7,
-          1 - rotationVelocity.x * 0.1,
-        )
+        fireUniform.u_rotationVelocity.value = rotationVelocity.x
       })
 
       const clock = new THREE.Clock()
