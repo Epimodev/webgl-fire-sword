@@ -1,4 +1,9 @@
-import type { Vector3 } from "three"
+// create custom Vector3 type to be able to use same functions to compute position and rotation velocity
+export type Vector3 = {
+  x: number
+  y: number
+  z: number
+}
 
 export const lerp = (min: number, max: number, value: number): number => {
   return (max - min) * value + min

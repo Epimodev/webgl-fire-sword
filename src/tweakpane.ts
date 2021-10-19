@@ -48,13 +48,13 @@ export const createTweakpane = (
     max: 1,
     step: 0.01,
   })
-  swordTab.addInput(handle.rotation, "z", {
+  swordTab.addInput(sword.rotation, "z", {
     label: "z rotation",
     min: -Math.PI,
     max: Math.PI,
     step: 0.01,
   })
-  swordTab.addInput(handle.rotation, "y", {
+  swordTab.addInput(sword.rotation, "y", {
     label: "y rotation",
     min: -Math.PI,
     max: Math.PI,
@@ -62,8 +62,8 @@ export const createTweakpane = (
   })
   swordTab.addInput(handle.rotation, "x", {
     label: "x rotation",
-    min: -Math.PI,
-    max: Math.PI,
+    min: -2 * Math.PI,
+    max: 2 * Math.PI,
     step: 0.01,
   })
 
