@@ -21,6 +21,17 @@ export const invLerp = (min: number, max: number, value: number): number => {
   return (value - min) / (max - min)
 }
 
+export const remap = (
+  inputMin: number,
+  inputMax: number,
+  outputMin: number,
+  outputMax: number,
+  value: number,
+): number => {
+  const t = invLerp(inputMin, inputMax, value)
+  return lerp(outputMin, outputMax, t)
+}
+
 export const clamp = (min: number, max: number, value: number): number => {
   return Math.min(max, Math.max(min, value))
 }

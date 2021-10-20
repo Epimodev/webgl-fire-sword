@@ -1,6 +1,10 @@
 // Taken from https://easings.net/
 
+import { remap } from "../utils/math"
+
 export type EasingFunction = (t: number) => number
+
+type Point = { x: number; y: number }
 
 const pow = Math.pow
 const sqrt = Math.sqrt
@@ -12,6 +16,85 @@ const c2 = c1 * 1.525
 const c3 = c1 + 1
 const c4 = (2 * PI) / 3
 const c5 = (2 * PI) / 4.5
+
+const getBezierPoint = (
+  startPoint: Point,
+  startHandle: Point,
+  endHandle: Point,
+  endPoint: Point,
+  t: number,
+): Point => {
+  const t3 = Math.pow(t, 3)
+  const t2 = Math.pow(t, 2)
+  const w0 = -t3 + 3 * t2 - 3 * t + 1
+  const w1 = 3 * t3 - 6 * t2 + 3 * t
+  const w2 = -3 * t3 + 3 * t2
+  const w3 = t3
+
+  return {
+    x:
+      startPoint.x * w0 +
+      startHandle.x * w1 +
+      endHandle.x * w2 +
+      endPoint.x * w3,
+    y:
+      startPoint.y * w0 +
+      startHandle.y * w1 +
+      endHandle.y * w2 +
+      endPoint.y * w3,
+  }
+}
+
+export const bezier = (
+  startHandle: Point,
+  endHandle: Point,
+): EasingFunction => {
+  // Generate linear interpolations of the bezier curve from 0 to 1
+  const startPoint = { x: 0, y: 0 }
+  const endPoint = { x: 1, y: 1 }
+  const nbPoints = 20
+  const points: Point[] = []
+  for (let i = 0; i < nbPoints; i += 1) {
+    const t = i / (nbPoints - 1)
+    const point = getBezierPoint(
+      startPoint,
+      startHandle,
+      endHandle,
+      endPoint,
+      t,
+    )
+    points.push(point)
+  }
+
+  return t => {
+    // get bezier curve points around t
+    let previousPoint = points[0]
+    let nextPoint = points[points.length - 1]
+    for (let i = 0; i < nbPoints; i += 1) {
+      if (t <= points[i].x) {
+        if (i === 0) {
+          previousPoint = points[0]
+          nextPoint = points[1]
+        } else {
+          previousPoint = points[i - 1]
+          nextPoint = points[i]
+        }
+        break
+      }
+    }
+
+    // linear interpolation between points around t
+    const result = remap(
+      previousPoint.x,
+      nextPoint.x,
+      previousPoint.y,
+      nextPoint.y,
+      t,
+    )
+
+    return result
+  }
+}
 
 export const linear: EasingFunction = x => x
 
