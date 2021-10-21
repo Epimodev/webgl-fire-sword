@@ -142,7 +142,7 @@ export const createTimeline = <V extends TimelineValue>(
   initial: V,
   definition: TimelineDefinition<V>,
   onChange: (values: V) => void,
-  onComplete: () => void,
+  onComplete: (params: Timeline<V>) => void,
 ): Timeline<V> => {
   const values = deepClone(initial)
   let frame: number | undefined = undefined
@@ -175,9 +175,8 @@ export const createTimeline = <V extends TimelineValue>(
       if (!completed) {
         frame = requestAnimationFrame(tick)
       } else {
-        onComplete()
+        onComplete(timeline)
         frame = undefined
-        timestamp = 0
       }
     }
 
@@ -201,7 +200,7 @@ export const createTimeline = <V extends TimelineValue>(
       if (timestamp > 0) {
         frame = requestAnimationFrame(tick)
       } else {
-        onComplete()
+        onComplete(timeline)
         frame = undefined
       }
     }
@@ -216,11 +215,13 @@ export const createTimeline = <V extends TimelineValue>(
     }
   }
 
-  return {
+  const timeline = {
     play,
     reverse,
     pause,
     seek,
     values,
   }
+
+  return timeline
 }

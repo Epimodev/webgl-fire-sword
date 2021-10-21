@@ -4,7 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
-import { createTimeline } from "./animation/timeline"
+import { createTimeline, Timeline } from "./animation/timeline"
 import { assets } from "./assets"
 import { createFire, FireUniforms, swordMovement } from "./fire"
 import {
@@ -76,11 +76,12 @@ const main = () => {
         handle.rotation.x = rotation.x
         sword.rotation.z = rotation.z
       }
-      const handleSwordAnimCompleted = () => {
-        // reset rotation x with a delay to avoid breaking fire animation
+      const handleSwordAnimCompleted = ({ seek }: Timeline<any>) => {
+        // reset timeline with a delay to avoid breaking fire animation
         // because reset without delay implies a negative speed by `swordMovement` which controls fire trail
+        // and we have to reset before next animation play to avoid starting the animation with a negative speed
         setTimeout(() => {
-          handle.rotation.x = swordVariables.rotation.x
+          seek(0)
         }, 1000)
       }
 
