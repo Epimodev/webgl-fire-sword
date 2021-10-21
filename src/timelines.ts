@@ -133,3 +133,57 @@ export const swordAnimation3Def: TimelineDefinition<typeof swordVariables> = {
     ],
   },
 }
+
+export const fireVariables = {
+  color1: {
+    // #ff3e00
+    r: 1,
+    g: 0.24313725490196078,
+    b: 0,
+  },
+  color2: {
+    // #ff7500
+    r: 1,
+    g: 0.4588235294117647,
+    b: 0,
+  },
+  color3: {
+    // #ffd600
+    r: 1,
+    g: 0.8392156862745098,
+    b: 0,
+  },
+  color4: {
+    // #fff5a8
+    r: 1,
+    g: 0.9607843137254902,
+    b: 0.6588235294117647,
+  },
+}
+
+export const fireAnimationDef: TimelineDefinition<typeof fireVariables> = {
+  color1: {
+    // #1800ff
+    r: [{ duration: 500, easing: Easings.linear, value: 0.09411764705882353 }],
+    g: [{ duration: 500, easing: Easings.linear, value: 0 }],
+    b: [{ duration: 500, easing: Easings.linear, value: 1 }],
+  },
+  color2: {
+    // #0059ff
+    r: [{ duration: 500, easing: Easings.linear, value: 0 }],
+    g: [{ duration: 500, easing: Easings.linear, value: 0.34901960784313724 }],
+    b: [{ duration: 500, easing: Easings.linear, value: 1 }],
+  },
+  color3: {
+    // #00acff
+    r: [{ duration: 500, easing: Easings.linear, value: 0 }],
+    g: [{ duration: 500, easing: Easings.linear, value: 0.6745098039215687 }],
+    b: [{ duration: 500, easing: Easings.linear, value: 1 }],
+  },
+  color4: {
+    // #a8e9ff
+    r: [{ duration: 500, easing: Easings.linear, value: 0.6588235294117647 }],
+    g: [{ duration: 500, easing: Easings.linear, value: 0.9137254901960784 }],
+    b: [{ duration: 500, easing: Easings.linear, value: 1 }],
+  },
+}

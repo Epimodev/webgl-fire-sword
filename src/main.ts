@@ -8,6 +8,8 @@ import { createTimeline, Timeline } from "./animation/timeline"
 import { assets } from "./assets"
 import { createFire, FireUniforms, swordMovement } from "./fire"
 import {
+  fireAnimationDef,
+  fireVariables,
   swordAnimation1Def,
   swordAnimation2Def,
   swordAnimation3Def,
@@ -64,13 +66,6 @@ const main = () => {
       const handle = sword.children[0]
       const blade = handle.children[0]
       blade.add(fire)
-      // @ts-expect-error
-      const fireUniform: FireUniforms = fire.material.uniforms
-
-      const swordVelocity = { x: 0, y: 0, z: 0 }
-      const interpolateSwordVelocity = lerpVec3(swordVelocity)
-      const handleVelocity = { x: 0, y: 0, z: 0 }
-      const interpolateHandleVelocity = lerpVec3(handleVelocity)
 
       const handleSwordFrame = ({ rotation }: typeof swordVariables) => {
         handle.rotation.x = rotation.x
@@ -83,6 +78,25 @@ const main = () => {
         setTimeout(() => {
           seek(0)
         }, 1000)
+      }
+
+      let fireColor: "red" | "blue" = "red"
+      const fireAnimation = createTimeline(
+        fireVariables,
+        fireAnimationDef,
+        ({ color1, color2, color3, color4 }) => {
+          fireUniform.u_color1.value.setRGB(color1.r, color1.g, color1.b)
+          fireUniform.u_color2.value.setRGB(color2.r, color2.g, color2.b)
+          fireUniform.u_color3.value.setRGB(color3.r, color3.g, color3.b)
+          fireUniform.u_color4.value.setRGB(color4.r, color4.g, color4.b)
+        },
+        () => {
+          // toggle color
+          fireColor === "red" ? (fireColor = "blue") : (fireColor = "red")
+        },
+      )
+      const toogleColor = () => {
+        fireColor === "red" ? fireAnimation.play() : fireAnimation.reverse()
       }
 
       const animation1 = createTimeline(
@@ -103,6 +117,14 @@ const main = () => {
         handleSwordFrame,
         handleSwordAnimCompleted,
       )
+
+      // @ts-expect-error
+      const fireUniform: FireUniforms = fire.material.uniforms
+
+      const swordVelocity = { x: 0, y: 0, z: 0 }
+      const interpolateSwordVelocity = lerpVec3(swordVelocity)
+      const handleVelocity = { x: 0, y: 0, z: 0 }
+      const interpolateHandleVelocity = lerpVec3(handleVelocity)
 
       swordMovement(sword, ({ swordRotation, handleRotation }) => {
         interpolateSwordVelocity(swordVelocity, swordRotation.velocity, 0.1)
@@ -130,6 +152,7 @@ const main = () => {
             sword,
             fire.material.uniforms as FireUniforms,
             animation1,
+            toogleColor,
           )
         })
       }

@@ -19,6 +19,7 @@ export const createTweakpane = (
   sword: THREE.Group,
   fireUniforms: FireUniforms,
   animation: Timeline<any>,
+  toggleColor: () => void,
 ): void => {
   const pane = new Tweakpane.Pane()
 
@@ -143,4 +144,7 @@ export const createTweakpane = (
   addColorInput(fireTab, "Color 2", fireUniforms.u_color2.value)
   addColorInput(fireTab, "Color 3", fireUniforms.u_color3.value)
   addColorInput(fireTab, "Color 4", fireUniforms.u_color4.value)
+  fireTab.addButton({ title: "Toggle color" }).on("click", () => {
+    toggleColor()
+  })
 }
