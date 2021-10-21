@@ -4,8 +4,15 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
+import { createTimeline } from "./animation/timeline"
 import { assets } from "./assets"
 import { createFire, FireUniforms, swordMovement } from "./fire"
+import {
+  swordAnimation1Def,
+  swordAnimation2Def,
+  swordAnimation3Def,
+  swordVariables,
+} from "./timelines"
 import { loadAssets } from "./utils/assetsLoader"
 import { getLoader } from "./utils/loader"
 import { lerpVec3 } from "./utils/math"
@@ -65,6 +72,37 @@ const main = () => {
       const handleVelocity = { x: 0, y: 0, z: 0 }
       const interpolateHandleVelocity = lerpVec3(handleVelocity)
 
+      const handleSwordFrame = ({ rotation }: typeof swordVariables) => {
+        handle.rotation.x = rotation.x
+        sword.rotation.z = rotation.z
+      }
+      const handleSwordAnimCompleted = () => {
+        // reset rotation x with a delay to avoid breaking fire animation
+        // because reset without delay implies a negative speed by `swordMovement` which controls fire trail
+        setTimeout(() => {
+          handle.rotation.x = swordVariables.rotation.x
+        }, 1000)
+      }
+
+      const animation1 = createTimeline(
+        swordVariables,
+        swordAnimation1Def,
+        handleSwordFrame,
+        handleSwordAnimCompleted,
+      )
+      const animation2 = createTimeline(
+        swordVariables,
+        swordAnimation2Def,
+        handleSwordFrame,
+        handleSwordAnimCompleted,
+      )
+      const animation3 = createTimeline(
+        swordVariables,
+        swordAnimation3Def,
+        handleSwordFrame,
+        handleSwordAnimCompleted,
+      )
+
       swordMovement(sword, ({ swordRotation, handleRotation }) => {
         interpolateSwordVelocity(swordVelocity, swordRotation.velocity, 0.1)
         interpolateHandleVelocity(handleVelocity, handleRotation.velocity, 0.1)
@@ -87,7 +125,11 @@ const main = () => {
       // Add tweakpane only during development
       if (process.env.NODE_ENV === "development") {
         import("./tweakpane").then(({ createTweakpane }) => {
-          createTweakpane(sword, fire.material.uniforms as FireUniforms)
+          createTweakpane(
+            sword,
+            fire.material.uniforms as FireUniforms,
+            animation1,
+          )
         })
       }
 

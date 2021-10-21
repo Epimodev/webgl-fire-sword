@@ -17,7 +17,7 @@ type TimelineInterval = {
   easing: EasingFunction
 }
 
-type TimelineDefinition<Value extends TimelineValue> = {
+export type TimelineDefinition<Value extends TimelineValue> = {
   [N in keyof Value]: Value[N] extends TimelineValue
     ? TimelineDefinition<Value[N]>
     : TimelineKeyframe[]
@@ -29,8 +29,8 @@ type TimelineIntervals<Value extends TimelineValue> = {
     : TimelineInterval[]
 }
 
-type Timeline<Value extends TimelineValue> = {
-  start: () => void
+export type Timeline<Value extends TimelineValue> = {
+  play: () => void
   pause: () => void
   seek: (timestamp: number) => void
   values: Value
@@ -104,7 +104,7 @@ const mutateValues = <V extends TimelineValue>(
     const value = values[key]
     if (typeof value === "number") {
       // @ts-expect-error if value is a number, intervals is an array of keyframes
-      const [v, valueCompleted] = getValueAt(timestamp, intervals)
+      const [v, valueCompleted] = getValueAt(timestamp, intervals[key])
       if (!valueCompleted) {
         completed.value = false
       }
@@ -141,6 +141,7 @@ export const createTimeline = <V extends TimelineValue>(
   initial: V,
   definition: TimelineDefinition<V>,
   onChange: (values: V) => void,
+  onComplete: () => void,
 ): Timeline<V> => {
   const values = deepClone(initial)
   let frame: number | undefined = undefined
@@ -155,7 +156,7 @@ export const createTimeline = <V extends TimelineValue>(
   }
 
   const start = () => {
-    if (frame === undefined) {
+    if (frame !== undefined) {
       return
     }
     startTimestamp = Date.now()
@@ -168,6 +169,7 @@ export const createTimeline = <V extends TimelineValue>(
       if (!completed) {
         frame = requestAnimationFrame(tick)
       } else {
+        onComplete()
         frame = undefined
       }
     }
@@ -183,7 +185,7 @@ export const createTimeline = <V extends TimelineValue>(
   }
 
   return {
-    start,
+    play: start,
     pause,
     seek,
     values,

@@ -1,4 +1,5 @@
 import * as Tweakpane from "tweakpane"
+import { Timeline } from "./animation/timeline"
 import type { FireUniforms } from "./fire"
 
 const addColorInput = (
@@ -17,6 +18,7 @@ const addColorInput = (
 export const createTweakpane = (
   sword: THREE.Group,
   fireUniforms: FireUniforms,
+  animation: Timeline<any>,
 ): void => {
   const pane = new Tweakpane.Pane()
 
@@ -29,6 +31,19 @@ export const createTweakpane = (
   /* ========================== */
   /* ========== SWORD ========= */
   /* ========================== */
+  swordTab.addButton({ title: "Play animation" }).on("click", () => {
+    animation.play()
+  })
+  swordTab
+    .addInput({ value: 0 }, "value", {
+      label: "Timeline",
+      min: 0,
+      max: 2000,
+      step: 1,
+    })
+    .on("change", ({ value }) => {
+      animation.seek(value)
+    })
   const handle = sword.children[0]
   swordTab.addInput(handle.position, "z", {
     label: "z position",

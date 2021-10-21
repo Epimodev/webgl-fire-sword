@@ -35,3 +35,5 @@ export const remap = (
 export const clamp = (min: number, max: number, value: number): number => {
   return Math.min(max, Math.max(min, value))
 }
+
+export const degToRad = (value: number) => remap(0, 180, 0, Math.PI, value)
