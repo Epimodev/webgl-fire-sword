@@ -31,6 +31,7 @@ type TimelineIntervals<Value extends TimelineValue> = {
 
 export type Timeline<Value extends TimelineValue> = {
   play: () => void
+  reverse: () => void
   pause: () => void
   seek: (timestamp: number) => void
   values: Value
@@ -145,28 +146,59 @@ export const createTimeline = <V extends TimelineValue>(
 ): Timeline<V> => {
   const values = deepClone(initial)
   let frame: number | undefined = undefined
-  let startTimestamp = 0
+  let timestamp = 0
+  let timestampOnPlay = 0
+  let playedAt = 0
 
   const intervals = createTimelineIntervals(initial, definition)
 
-  const seek = (timestamp: number): boolean => {
+  const seek = (newTimestamp: number): boolean => {
+    timestamp = newTimestamp
     const completed = mutateValues(timestamp, intervals, values)
     onChange(values)
     return completed
   }
 
-  const start = () => {
+  const play = () => {
     if (frame !== undefined) {
       return
     }
-    startTimestamp = Date.now()
+    timestampOnPlay = timestamp
+    playedAt = Date.now()
 
     const tick = () => {
       const now = Date.now()
-      const timestamp = now - startTimestamp
+      const timestampOffset = now - playedAt
+      timestamp = timestampOnPlay + timestampOffset
       const completed = seek(timestamp)
 
       if (!completed) {
+        frame = requestAnimationFrame(tick)
+      } else {
+        onComplete()
+        frame = undefined
+        timestamp = 0
+      }
+    }
+
+    frame = requestAnimationFrame(tick)
+  }
+
+  const reverse = () => {
+    if (frame !== undefined) {
+      return
+    }
+    timestampOnPlay = timestamp
+    playedAt = Date.now()
+
+    const tick = () => {
+      const now = Date.now()
+      const timestampOffset = now - playedAt
+      // avoid negative timestamp
+      timestamp = Math.max(0, timestampOnPlay - timestampOffset)
+      seek(timestamp)
+
+      if (timestamp > 0) {
         frame = requestAnimationFrame(tick)
       } else {
         onComplete()
@@ -185,7 +217,8 @@ export const createTimeline = <V extends TimelineValue>(
   }
 
   return {
-    play: start,
+    play,
+    reverse,
     pause,
     seek,
     values,

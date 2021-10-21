@@ -34,6 +34,12 @@ export const createTweakpane = (
   swordTab.addButton({ title: "Play animation" }).on("click", () => {
     animation.play()
   })
+  swordTab.addButton({ title: "Pause animation" }).on("click", () => {
+    animation.pause()
+  })
+  swordTab.addButton({ title: "Reverse animation" }).on("click", () => {
+    animation.reverse()
+  })
   swordTab
     .addInput({ value: 0 }, "value", {
       label: "Timeline",
