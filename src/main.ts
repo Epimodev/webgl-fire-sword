@@ -6,6 +6,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import { createTimeline, Timeline } from "./animation/timeline"
 import { assets } from "./assets"
+import { createControls } from "./controls"
 import { createFire, FireUniforms, swordMovement } from "./fire"
 import {
   fireAnimationDef,
@@ -18,6 +19,7 @@ import {
 import { loadAssets } from "./utils/assetsLoader"
 import { getLoader } from "./utils/loader"
 import { lerpVec3 } from "./utils/math"
+import { assertNever } from "./utils/types"
 
 const MAX_PIXEL_RATIO = 2
 
@@ -91,7 +93,7 @@ const main = () => {
           fireUniform.u_color4.value.setRGB(color4.r, color4.g, color4.b)
         },
         () => {
-          // toggle color
+          // toggle color state
           fireColor === "red" ? (fireColor = "blue") : (fireColor = "red")
         },
       )
@@ -121,11 +123,11 @@ const main = () => {
       // @ts-expect-error
       const fireUniform: FireUniforms = fire.material.uniforms
 
+      // Animate fire depending on sword velocity
       const swordVelocity = { x: 0, y: 0, z: 0 }
       const interpolateSwordVelocity = lerpVec3(swordVelocity)
       const handleVelocity = { x: 0, y: 0, z: 0 }
       const interpolateHandleVelocity = lerpVec3(handleVelocity)
-
       swordMovement(sword, ({ swordRotation, handleRotation }) => {
         interpolateSwordVelocity(swordVelocity, swordRotation.velocity, 0.1)
         interpolateHandleVelocity(handleVelocity, handleRotation.velocity, 0.1)
@@ -139,11 +141,25 @@ const main = () => {
         )
       })
 
-      const clock = new THREE.Clock()
-      clock.start()
-
-      // const axes = new THREE.AxesHelper()
-      // scene.add(axes)
+      // Create controls to run animations
+      createControls(({ type }) => {
+        switch (type) {
+          case "toggle-color":
+            toogleColor()
+            break
+          case "animation-1":
+            animation1.play()
+            break
+          case "animation-2":
+            animation2.play()
+            break
+          case "animation-3":
+            animation3.play()
+            break
+          default:
+            assertNever(type)
+        }
+      })
 
       // Add tweakpane only during development
       if (process.env.NODE_ENV === "development") {
@@ -156,6 +172,9 @@ const main = () => {
           )
         })
       }
+
+      const clock = new THREE.Clock()
+      clock.start()
 
       createPlayground({
         scene,
