@@ -1,12 +1,19 @@
+@font-face {
+  font-family: "Bankai";
+  src: url("/fonts/bankai.woff2") format("woff2");
+  font-weight: 400;
+ }
+
 body {
-  font-family: 'Roboto Mono', 'Source Code Pro', 'Menlo', Courier, monospace;
+  font-family: 'Bankai', 'Menlo', Courier, monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
 
-  --btn-background: #0c0926;
-  --btn-hover-background: #000000;
-  --btn-color: #59eaf0;
+  --background-color: #1D1E2C;
+  --text-color: #E9ECF5;
+  --primary-color: #F4D35E;
+  --btn-color: #59656F;
 }
 
 .overlay {
@@ -20,8 +27,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: var(--btn-background);
-  color: white;
+  background-color: var(--background-color);
   opacity: 1;
 }
 .overlay-fadeout {
@@ -33,26 +39,47 @@ body {
   display: none;
 }
 
-.overlay-title {
-  margin-bottom: 16px;
+.loader-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--primary-color);
 }
 
-.progress-bar {
-  position: relative;
-  width: 320px;
-  height: 6px;
-  background-color: rgba(255, 255, 255, 0.2);
-}
-.progress-bar-loaded {
+.loader-svg {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: var(--btn-color);
-  transform-origin: 0 0;
-  transform: scaleX(0);
-  transition: 200ms;
+}
+
+.loader-circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 10px;
+  stroke-dasharray: 597px; /* 95 * 2 * PI */
+  stroke-dashoffset: 597px;
+  transform-origin: 50% 50%;
+  transform: rotate(-90deg);
+  transition-duration: 300ms;
+  transition-property: stroke-dashoffset;
+}
+
+.loader-percentage {
+  position: relative;
+  top: 15px;
+  text-align: center;
+  font-size: 80px;
+}
+
+.loader-text {
+  margin-top: 32px;
+  font-size: 50px;
+  color: var(--primary-color);
 }
 
 #webgl {

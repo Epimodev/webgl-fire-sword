@@ -7,11 +7,11 @@ type Loader = {
 export const getLoader = (): Loader => {
   const overlay = document.getElementById("loader-overlay") as HTMLDivElement
   const percentage = overlay.querySelector(
-    ".loading-percentage",
+    ".loader-percentage",
   ) as HTMLSpanElement
-  const progressBar = overlay.querySelector(
-    ".progress-bar-loaded",
-  ) as HTMLDivElement
+  const loaderCircle = overlay.querySelector(
+    ".loader-circle",
+  ) as SVGCircleElement
 
   // Remove loading end animation during development
   if (process.env.NODE_ENV === "development") {
@@ -29,11 +29,15 @@ export const getLoader = (): Loader => {
     }
   }
 
+  const circleRadius = 95
+  const circlePerimeter = Math.round(circleRadius * 2 * Math.PI)
+
   return {
     setPercentage: (value: number) => {
       const percentageLoaded = Math.round(value * 100)
-      percentage.innerHTML = percentageLoaded.toString()
-      progressBar.style.transform = `scaleX(${value})`
+      percentage.innerHTML = `${percentageLoaded}%`
+      const offset = (1 - value) * circlePerimeter
+      loaderCircle.style.strokeDashoffset = `${offset}px`
     },
     hide: () => {
       overlay.classList.add("overlay-fadeout")
@@ -49,8 +53,8 @@ export const getLoader = (): Loader => {
       }, hideTimeout)
     },
     displayError: () => {
-      const title = overlay.querySelector(".overlay-title") as HTMLDivElement
-      title.innerHTML =
+      const text = overlay.querySelector(".loader-text") as HTMLDivElement
+      text.innerHTML =
         "Failed to load assets, please retry by reloading the page."
     },
   }

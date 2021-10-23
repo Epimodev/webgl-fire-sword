@@ -29,3 +29,4 @@ yarn dev
 ## Credits
 
 - Favicon made by [juicy_fish](https://www.flaticon.com/authors/juicy-fish)
+- Font made by [Allouse.Studio](https://www.fontspace.com/allousestudio)

@@ -12,12 +12,14 @@
   </head>
   <body>
     <div id="loader-overlay" class="overlay">
-      <div class="overlay-title">
-        Loading
-        <span class="loading-percentage">0</span>%
+      <div class="loader-container">
+        <svg viewBox="0 0 200 200" class="loader-svg">
+          <circle cx="100" cy="100" r="95" class="loader-circle" />
+        </svg>
+        <div class="loader-percentage">0%</div>
       </div>
-      <div class="progress-bar">
-        <span class="progress-bar-loaded"></span>
+      <div class="loader-text">
+        Loading
       </div>
     </div>
     <canvas id="webgl"></canvas>
