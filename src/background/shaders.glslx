@@ -1,0 +1,20 @@
+precision highp float;
+
+attribute vec2 uv;
+
+varying vec2 v_uv;
+
+#include "../shaders/interpolation.glslx"
+
+export void backgroundVertex() {
+  float x = lerp(-1.0, 1.0, uv.x);
+  float y = lerp(-1.0, 1.0, uv.y);
+
+  gl_Position = vec4(x, y, 1.0, 1.0);
+}
+
+export void backgroundFragment() {
+  vec3 color = vec3(0.0);
+
+  gl_FragColor = vec4(color, 1.0);
+}

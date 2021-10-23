@@ -6,6 +6,7 @@ import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import { createTimeline, Timeline } from "./animation/timeline"
 import { assets } from "./assets"
+import { createBackground } from "./background"
 import { createControls } from "./controls"
 import { createFire, FireUniforms, swordMovement } from "./fire"
 import {
@@ -60,6 +61,9 @@ const main = () => {
       })
 
       const time: THREE.IUniform<number> = { value: 0 }
+
+      const background = createBackground(time)
+      scene.add(background)
 
       const fire = createFire(sceneAssets, time)
       fire.rotation.y = Math.PI / 2
@@ -226,7 +230,7 @@ const createPlayground = ({
     canvas,
     antialias: true,
   })
-  renderer.setClearColor(0x333333)
+  renderer.setClearColor(0x1d1e2c)
   renderer.physicallyCorrectLights = true
   renderer.toneMapping = THREE.ReinhardToneMapping
   renderer.toneMappingExposure = 3
