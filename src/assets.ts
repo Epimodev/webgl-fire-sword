@@ -25,6 +25,10 @@ export const assets = {
     type: "texture" as const,
     url: "/textures/sword/sword-trail-mask.png",
   },
+  swordTrailStartMask: {
+    type: "texture" as const,
+    url: "/textures/sword/sword-trail-start-mask.png",
+  },
   swordTrailNoise: {
     type: "texture" as const,
     url: "/textures/sword/sword-trail-noise.png",

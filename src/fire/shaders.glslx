@@ -13,6 +13,7 @@ uniform vec2 u_bendOrigin;
 uniform float u_bendScale;
 uniform sampler2D u_trailPattern;
 uniform sampler2D u_trailMask;
+uniform sampler2D u_trailStartMask;
 uniform sampler2D u_trailNoise;
 uniform float u_patternScale;
 uniform float u_patternSpeed;
@@ -61,8 +62,9 @@ export void fireFragment() {
 
   float firePattern = texture2D(u_trailPattern, patternUv).r;
   float fireMask = texture2D(u_trailMask, maskUv).r;
+  float startMask = texture2D(u_trailStartMask, v_uv).r;
 
-  float shape = firePattern * fireMask;
+  float shape = firePattern * fireMask * startMask;
 
   // color ramp
   vec3 color = mix(u_color1, u_color2, smoothstep(0.0, 0.432, shape));

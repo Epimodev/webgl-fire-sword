@@ -20,6 +20,7 @@ export type FireUniforms = {
   u_bendOrigin: THREE.IUniform<THREE.Vector2>
   u_trailPattern: THREE.IUniform<THREE.Texture>
   u_trailMask: THREE.IUniform<THREE.Texture>
+  u_trailStartMask: THREE.IUniform<THREE.Texture>
   u_trailNoise: THREE.IUniform<THREE.Texture>
   u_patternScale: THREE.IUniform<number>
   u_patternSpeed: THREE.IUniform<number>
@@ -31,7 +32,12 @@ export type FireUniforms = {
 }
 
 export const createFire = (
-  { swordTrail, swordTrailMask, swordTrailNoise }: SceneAssets,
+  {
+    swordTrail,
+    swordTrailMask,
+    swordTrailNoise,
+    swordTrailStartMask,
+  }: SceneAssets,
   time: THREE.IUniform<number>,
 ): THREE.Mesh<THREE.PlaneGeometry, THREE.RawShaderMaterial> => {
   const fireWidth = 0.76
@@ -44,6 +50,7 @@ export const createFire = (
     u_bendOrigin: { value: new THREE.Vector2(-fireWidth / 2, 0) },
     u_trailPattern: { value: swordTrail },
     u_trailMask: { value: swordTrailMask },
+    u_trailStartMask: { value: swordTrailStartMask },
     u_trailNoise: { value: swordTrailNoise },
     u_patternScale: { value: 2 },
     u_patternSpeed: { value: 30 },

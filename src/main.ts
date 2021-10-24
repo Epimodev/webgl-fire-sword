@@ -92,7 +92,7 @@ const main = () => {
       const fire = createFire(sceneAssets, time)
       fire.rotation.y = Math.PI / 2
       fire.position.y = 0.41
-      fire.position.z = -0.401
+      fire.position.z = -0.38
       const handle = sword.children[0]
       const blade = handle.children[0]
       blade.add(fire)
