@@ -1,11 +1,5 @@
-@font-face {
-  font-family: "Bankai";
-  src: url("/fonts/bankai.woff2") format("woff2");
-  font-weight: 400;
- }
-
 body {
-  font-family: 'Bankai', 'Menlo', Courier, monospace;
+  font-family: 'Zen Old Mincho', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
@@ -73,10 +67,8 @@ body {
 }
 
 .loader-percentage {
-  position: relative;
-  top: 15px;
   text-align: center;
-  font-size: 80px;
+  font-size: 50px;
 }
 
 .loader-text {
@@ -97,7 +89,7 @@ body {
   justify-content: flex-start;
   align-items: center;
   flex-wrap: wrap;
-  padding-bottom: 24px;
+  background-color: var(--btn-color);
 }
 .animation-button {
   position: relative;
@@ -105,17 +97,26 @@ body {
   background: none;
   font: inherit;
   font-size: 20px;
-  height: 40px;
-  margin: 6px 12px;
-  padding: 0 12px;
+  padding: 12px;
+  margin: 0;
   flex-shrink: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
   color: var(--text-color);
-  background-color: var(--btn-color);
+  font-weight: 700;
+  cursor: pointer;
   transition-duration: 300ms;
   transition-property: opacity;
 }
 .animation-button:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
+}
+.animation-button-icon {
+  position: relative;
+  top: 3px;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  transform: translate(0);
 }
 .animation-button-progress {
   position: absolute;
@@ -130,6 +131,25 @@ body {
 }
 .animation-button-progress_processing {
   transform: scaleX(1);
+}
+
+/* Mobile only */
+@media screen and (max-width: 650px) {
+  .animation-button {
+    padding: 12px 10px;
+  }
+  .animation-button-icon {
+    margin-right: 4px;
+  }
+  .animation-button-label-desktop {
+    display: none;
+  }
+}
+/* Desktop only */
+@media screen and (min-width: 650px) {
+  .animation-button-label-mobile {
+    display: none;
+  }
 }
 
 /* ==================== */

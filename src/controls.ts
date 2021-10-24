@@ -11,10 +11,34 @@ type ControlEvent = {
 const COLOR_CHANGE_DURATION = 500
 const ANIMATION_DURATION = 3000
 
-const createButton = (label: string): HTMLButtonElement => {
+const createPlayIcon = (): SVGSVGElement => {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg")
+  svg.classList.add("animation-button-icon")
+  svg.innerHTML = '<use xlink:href="#play" />'
+  return svg
+}
+
+const createButton = (
+  desktopLabel: string,
+  mobileLabel: string,
+  withPlayIcon: boolean,
+): HTMLButtonElement => {
   const button = document.createElement("button")
   button.className = "animation-button"
-  button.innerHTML = label
+
+  const desktopLabelElement = document.createElement("span")
+  desktopLabelElement.className = "animation-button-label-desktop"
+  desktopLabelElement.innerHTML = desktopLabel
+
+  const mobileLabelElement = document.createElement("span")
+  mobileLabelElement.className = "animation-button-label-mobile"
+  if (withPlayIcon) {
+    const buttonIcon = createPlayIcon()
+    mobileLabelElement.appendChild(buttonIcon)
+  }
+  const mobileLabelText = document.createElement("span")
+  mobileLabelText.innerHTML = mobileLabel
+  mobileLabelElement.appendChild(mobileLabelText)
 
   // Be carreful, changing this will impact buttons listener which get this HTML element
   // lile this: `const progress = button.children[0] as HTMLSpanElement`
@@ -22,6 +46,8 @@ const createButton = (label: string): HTMLButtonElement => {
   progress.className = "animation-button-progress"
 
   button.appendChild(progress)
+  button.appendChild(mobileLabelElement)
+  button.appendChild(desktopLabelElement)
   return button
 }
 
@@ -42,10 +68,16 @@ export const createControls = (
 ): void => {
   const controls = document.createElement("div")
   controls.className = "controls"
-  const toggleColorButton = createButton("Change fire color")
-  const animation1Button = createButton("Animation 1")
-  const animation2Button = createButton("Animation 2")
-  const animation3Button = createButton("Animation 3")
+  const withPlayIcon = true
+  const withoutPlayIcon = false
+  const toggleColorButton = createButton(
+    "Change fire color",
+    "Change color",
+    withoutPlayIcon,
+  )
+  const animation1Button = createButton("Animation 1", "1", withPlayIcon)
+  const animation2Button = createButton("Animation 2", "2", withPlayIcon)
+  const animation3Button = createButton("Animation 3", "3", withPlayIcon)
 
   toggleColorButton.addEventListener("click", () => {
     disableButtons(toggleColorButton)
