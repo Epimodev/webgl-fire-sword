@@ -36,7 +36,7 @@ const main = () => {
   const far = 100
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
   camera.position.z = 0
-  camera.position.x = 2
+  camera.position.x = 2.5
   camera.position.y = 0
   camera.lookAt(new THREE.Vector3(0, 0, 0))
 

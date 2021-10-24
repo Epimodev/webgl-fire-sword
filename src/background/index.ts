@@ -11,8 +11,8 @@ export const createBackground = (
       fragmentShader: backgroundFragment,
       uniforms: {
         u_time: time,
-        u_color1: { value: new THREE.Color(0x000000) },
-        u_color2: { value: new THREE.Color(0x1d1e2c) },
+        u_color1: { value: new THREE.Color(0x1d1e2c) },
+        u_color2: { value: new THREE.Color(0x59656f) },
       },
     }),
   )
