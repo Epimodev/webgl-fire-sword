@@ -1,9 +1,6 @@
 import Stats from "stats.js"
 import * as THREE from "three"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass"
 import { createTimeline, Timeline } from "./animation/timeline"
 import { assets } from "./assets"
 import { createBackground } from "./background"
@@ -259,20 +256,6 @@ const createPlayground = ({
   renderer.toneMapping = THREE.ReinhardToneMapping
   renderer.toneMappingExposure = 3
 
-  const effectComposer = new EffectComposer(renderer)
-  const renderPass = new RenderPass(scene, camera)
-  const bloomRadius = 0
-  const bloomThreshold = 0.65
-  const bloomStrength = 0.8
-  const bloomPass = new UnrealBloomPass(
-    new THREE.Vector2(window.innerWidth, window.innerHeight),
-    bloomStrength,
-    bloomRadius,
-    bloomThreshold,
-  )
-  effectComposer.addPass(renderPass)
-  // effectComposer.addPass(bloomPass)
-
   // Controls
   const controls = new OrbitControls(camera, canvas)
   controls.enableDamping = true
@@ -295,9 +278,6 @@ const createPlayground = ({
     // Update renderer and effect composer size and pixel ratio
     renderer.setSize(size.width, size.height)
     renderer.setPixelRatio(pixelRatio)
-    effectComposer.setSize(size.width, size.height)
-    effectComposer.setPixelRatio(pixelRatio)
-    bloomPass.setSize(size.width, size.height)
 
     // Create a new instance because `size` object is changed on resize
     onResize?.({ width: size.width, height: size.height })
@@ -316,7 +296,7 @@ const createPlayground = ({
     controls.update()
 
     // Render
-    effectComposer.render()
+    renderer.render(scene, camera)
 
     stats.end()
     // Call tick again on the next frame
