@@ -2,7 +2,9 @@
 
 ## Presentation
 
-This project is the source code of an explosion animation you can try here: https://webgl-fire-sword.vercel.app/  
+This project is the source code of a sword with fire animation you can try here: https://webgl-fire-sword.vercel.app/  
+
+It was inspired by this Blender VFX tutorial made by [@pierrick_picaut](https://twitter.com/pierrick_picaut): https://www.youtube.com/watch?v=bzwp-ng-f1Y
 
 ## Techonoly used
 
@@ -28,4 +30,5 @@ yarn dev
 
 ## Credits
 
+- Tutorial that inspired this project [Real time sword trail in Blender](https://www.youtube.com/watch?v=bzwp-ng-f1Y) by [@pierrick_picaut](https://twitter.com/pierrick_picaut)
 - Favicon made by [juicy_fish](https://www.flaticon.com/authors/juicy-fish)
