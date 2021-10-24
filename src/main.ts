@@ -10,6 +10,8 @@ import { createBackground } from "./background"
 import { createControls } from "./controls"
 import { createFire, FireUniforms, swordMovement } from "./fire"
 import {
+  cameraAnimationDef,
+  cameraVariables,
   fireAnimationDef,
   fireVariables,
   swordAnimation1Def,
@@ -24,6 +26,18 @@ import { assertNever } from "./utils/types"
 
 const MAX_PIXEL_RATIO = 2
 
+const updateEnvIntensity = (scene: THREE.Scene, value: number): void => {
+  scene.traverse(child => {
+    if (
+      child instanceof THREE.Mesh &&
+      child.material instanceof THREE.MeshStandardMaterial
+    ) {
+      child.material.envMapIntensity = value
+      child.material.needsUpdate = true
+    }
+  })
+}
+
 const main = () => {
   const loader = getLoader()
 
@@ -35,10 +49,24 @@ const main = () => {
   const near = 0.1
   const far = 100
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
-  camera.position.z = 0
-  camera.position.x = 2.5
-  camera.position.y = 0
+  camera.position.set(
+    cameraVariables.position.x,
+    cameraVariables.position.y,
+    cameraVariables.position.z,
+  )
   camera.lookAt(new THREE.Vector3(0, 0, 0))
+
+  const sceneAnimation = createTimeline(
+    cameraVariables,
+    cameraAnimationDef,
+    ({ position }) => {
+      camera.position.set(position.x, position.y, position.z)
+      camera.lookAt(new THREE.Vector3(0, 0, 0))
+    },
+    () => {
+      return
+    },
+  )
 
   loadAssets(
     assets,
@@ -48,17 +76,13 @@ const main = () => {
     sceneAssets => {
       const { sword, environment } = sceneAssets
       scene.environment = environment
-
       scene.add(sword)
-      scene.traverse(child => {
-        if (
-          child instanceof THREE.Mesh &&
-          child.material instanceof THREE.MeshStandardMaterial
-        ) {
-          child.material.envMapIntensity = 1
-          child.material.needsUpdate = true
-        }
-      })
+
+      updateEnvIntensity(scene, 1)
+
+      // once sword and evironment are loaded and added to the scene
+      // we play enter animation
+      sceneAnimation.play()
 
       const time: THREE.IUniform<number> = { value: 0 }
 

@@ -2,6 +2,52 @@ import * as Easings from "./animation/easing"
 import type { TimelineDefinition } from "./animation/timeline"
 import { degToRad } from "./utils/math"
 
+const pause = (value: number, duration: number) => ({
+  value,
+  duration,
+  easing: Easings.linear,
+})
+
+export const cameraVariables = {
+  position: {
+    x: -10,
+    y: 10,
+    z: 15,
+  },
+}
+
+const sceneEnterDelay = 1500
+const sceneEnterDuration = 2000
+
+export const cameraAnimationDef: TimelineDefinition<typeof cameraVariables> = {
+  position: {
+    x: [
+      pause(cameraVariables.position.x, sceneEnterDelay),
+      {
+        duration: sceneEnterDuration,
+        value: 2.5,
+        easing: Easings.easeOutExpo,
+      },
+    ],
+    y: [
+      pause(cameraVariables.position.y, sceneEnterDelay),
+      {
+        duration: sceneEnterDuration,
+        value: 0,
+        easing: Easings.easeOutExpo,
+      },
+    ],
+    z: [
+      pause(cameraVariables.position.z, sceneEnterDelay),
+      {
+        duration: sceneEnterDuration,
+        value: 0,
+        easing: Easings.easeOutExpo,
+      },
+    ],
+  },
+}
+
 export const swordVariables = {
   rotation: {
     x: degToRad(15),
